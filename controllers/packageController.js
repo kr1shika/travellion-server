@@ -587,77 +587,82 @@ exports.updatePackage = async (req, res) => {
 // =====================================================
 // DELETE PACKAGE
 // =====================================================
+const { cloudinary } = require('../config/cloudinary');
 
+// =====================================================
+// DELETE PACKAGE
+// =====================================================
 exports.deletePackage = async (req, res) => {
-
-    const session = await mongoose.startSession();
-
     try {
-
         const { id } = req.params;
 
-        session.startTransaction();
-
-
-        const deletedPackage =
-            await Package.findByIdAndDelete(
-                id,
-                { session }
-            );
-
-
-        if (!deletedPackage) {
-
-            await session.abortTransaction();
-
+        // ----------------------------------------
+        // 1. Find package first (needed for existence check)
+        // ----------------------------------------
+        const packageData = await Package.findById(id);
+        if (!packageData) {
             return res.status(404).json({
                 success: false,
-                message: 'Package not found'
+                message: 'Package not found',
             });
         }
 
+        // ----------------------------------------
+        // 2. Delete related images from Cloudinary
+        // ----------------------------------------
+        const images = await Image.find({ packageId: id });
 
-        // Delete related itinerary
-        await Itinerary.deleteMany(
-            { packageId: id },
-            { session }
-        );
+        for (const img of images) {
+            try {
+                const urlParts = img.url.split('/');
+                const filename = urlParts[urlParts.length - 1];
+                const folderIndex = urlParts.indexOf('trektravel');
 
+                // Rebuild the public_id: "trektravel/packages/abc123"
+                const publicId =
+                    folderIndex !== -1
+                        ? urlParts
+                            .slice(folderIndex)
+                            .join('/')
+                            .split('.')[0]
+                        : filename.split('.')[0];
 
-        // Delete related images
-        await Image.deleteMany(
-            { packageId: id },
-            { session }
-        );
+                await cloudinary.uploader.destroy(publicId);
+            } catch (cloudinaryError) {
+                console.error(
+                    'Cloudinary delete failed for',
+                    img.url,
+                    cloudinaryError.message
+                );
+                // keep going — don't block DB cleanup
+            }
+        }
 
+        // ----------------------------------------
+        // 3. Delete DB records (order matters for safety)
+        // ----------------------------------------
+        await Image.deleteMany({ packageId: id });
+        await Itinerary.deleteMany({ packageId: id });
+        await Package.findByIdAndDelete(id);
 
-        await session.commitTransaction();
-
-
+        // ----------------------------------------
+        // 4. Response
+        // ----------------------------------------
         res.status(200).json({
-
             success: true,
-
             message:
-                'Package and related data deleted successfully'
+                'Package, itinerary, and images deleted successfully',
         });
 
-
     } catch (error) {
-
-        await session.abortTransaction();
+        console.error('Delete package error:', error);
 
         res.status(500).json({
             success: false,
-            message: error.message
+            message: error.message,
         });
-
-    } finally {
-
-        await session.endSession();
     }
 };
-
 
 // =====================================================
 // FEATURED PACKAGES

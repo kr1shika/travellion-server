@@ -21,6 +21,7 @@ router.get('/customer/:customerId', inquiryController.getCustomerInquiries);
 // Get all inquiries with filters
 router.get('/', protect,
     adminOnly, inquiryController.getAllInquiries);
+router.get('/stats/overview', inquiryController.getInquiryStats);
 
 // Get single inquiry
 router.get('/:id', inquiryController.getInquiry);
@@ -36,7 +37,7 @@ router.delete('/:id', protect,
     adminOnly, inquiryController.deleteInquiry);
 
 // Get statistics
-router.get('/stats/overview', inquiryController.getInquiryStats);
+// router.get('/stats/overview', inquiryController.getInquiryStats);
 
 // Bulk update status
 router.put('/bulk/status', inquiryController.bulkUpdateStatus);
