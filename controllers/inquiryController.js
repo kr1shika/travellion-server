@@ -275,21 +275,21 @@ exports.deleteInquiry = async (req, res) => {
 exports.getInquiryStats = async (req, res) => {
     try {
         const total = await Inquiry.countDocuments();
-        
+
         const statusStats = await Inquiry.aggregate([
             { $group: { _id: '$status', count: { $sum: 1 } } }
         ]);
 
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        
+
         const todayInquiries = await Inquiry.countDocuments({
             createdAt: { $gte: today }
         });
 
         const weekAgo = new Date();
         weekAgo.setDate(weekAgo.getDate() - 7);
-        
+
         const weekInquiries = await Inquiry.countDocuments({
             createdAt: { $gte: weekAgo }
         });

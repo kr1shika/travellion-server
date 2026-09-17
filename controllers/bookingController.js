@@ -1,6 +1,6 @@
 const Booking = require('../models/Booking');
 const Customer = require('../models/Customer');
-const Package = require('../models/Package');
+const Package = require('../models/package');
 
 // ============================================
 // CREATE BOOKING

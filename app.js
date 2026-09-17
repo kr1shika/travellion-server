@@ -5,7 +5,6 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-// Import routes
 const packageRoutes = require('./routes/packageRoutes');
 const customerRoutes =
     require('./routes/customerRoute');
@@ -13,6 +12,10 @@ const customerRoutes =
 const bookingRoutes =
     require('./routes/bookingRoute');
 const inquiryRoutes = require('./routes/inquiryRoute');
+
+const adminRoutes =
+    require('./routes/adminRoutes');
+const imageRoutes = require('./routes/imageRoute');
 
 // Initialize express app
 const app = express();
@@ -162,6 +165,14 @@ app.use(
     '/api/bookings',
     bookingRoutes
 );
+
+app.use(
+    '/api/admins',
+    adminRoutes
+);
+
+app.use('/api/images', imageRoutes);
+
 
 // 404 handler - Route not found
 app.use((req, res) => {

@@ -5,7 +5,7 @@ const imageSchema = new mongoose.Schema(
         packageId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Package',
-            required: true,
+            required: false,
             index: true,
         },
 

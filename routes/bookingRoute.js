@@ -5,6 +5,10 @@ const router = express.Router();
 const bookingController =
     require('../controllers/bookingController');
 
+const {
+    protect,
+    adminOnly
+} = require('../middleware/auth');
 // ============================================
 // BOOKINGS
 // ============================================
@@ -18,6 +22,8 @@ router.post(
 // Get all bookings
 router.get(
     '/',
+    protect,
+    adminOnly,
     bookingController.getAllBookings
 );
 
@@ -30,24 +36,31 @@ router.get(
 // Get single booking
 router.get(
     '/:id',
+    protect,
+    adminOnly,
     bookingController.getBooking
 );
 
 // Update booking
 router.put(
     '/:id',
+    protect,
+    adminOnly,
     bookingController.updateBooking
 );
 
 // Update booking status
 router.patch(
     '/:id/status',
+    protect,
+    adminOnly,
     bookingController.updateBookingStatus
 );
 
 // Delete booking
 router.delete(
-    '/:id',
+    '/:id', protect,
+    adminOnly,
     bookingController.deleteBooking
 );
 

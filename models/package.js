@@ -11,10 +11,11 @@ const packageSchema = new mongoose.Schema(
 
         slug: {
             type: String,
-            required: true,
             unique: true,
             lowercase: true,
             trim: true,
+            index: true,
+            // no `required: true` — backend generates it
         },
 
         category: {
@@ -333,7 +334,6 @@ const packageSchema = new mongoose.Schema(
             ref: 'Admin',
         },
     },
-
     {
         timestamps: true,
         toJSON: { virtuals: true },
@@ -427,7 +427,6 @@ packageSchema.statics.getPopular = function (limit = 4) {
         .sort({ views: -1 })
         .limit(limit);
 };
-
 
 // Instance methods
 packageSchema.methods.checkAvailability = function (date) {

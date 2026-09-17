@@ -6,6 +6,10 @@ const customerController =
     require('../controllers/customerController');
 
 
+const {
+    protect,
+    adminOnly
+} = require('../middleware/auth');
 // Create customer
 router.post(
     '/',
@@ -15,6 +19,8 @@ router.post(
 // Get all customers
 router.get(
     '/',
+    protect,
+    adminOnly,
     customerController.getAllCustomers
 );
 

@@ -3,6 +3,10 @@ const router = express.Router();
 const inquiryController = require('../controllers/inquiryController');
 // const { protectAdmin, protectCustomer } = require('../middleware/auth');
 
+const {
+    protect,
+    adminOnly
+} = require('../middleware/auth');
 // Create inquiry - Anyone can submit
 router.post('/', inquiryController.createInquiry);
 
@@ -15,7 +19,8 @@ router.get('/customer/:customerId', inquiryController.getCustomerInquiries);
 
 
 // Get all inquiries with filters
-router.get('/', inquiryController.getAllInquiries);
+router.get('/', protect,
+    adminOnly, inquiryController.getAllInquiries);
 
 // Get single inquiry
 router.get('/:id', inquiryController.getInquiry);
@@ -27,7 +32,8 @@ router.put('/:id/status', inquiryController.updateInquiryStatus);
 router.put('/:id/respond', inquiryController.respondToInquiry);
 
 // Delete inquiry
-router.delete('/:id', inquiryController.deleteInquiry);
+router.delete('/:id', protect,
+    adminOnly, inquiryController.deleteInquiry);
 
 // Get statistics
 router.get('/stats/overview', inquiryController.getInquiryStats);
